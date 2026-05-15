@@ -1,0 +1,13 @@
+{
+  "itemGroup.xpcrafting": "Example Mod Tab",
+  "block.xpcrafting.example_block": "Example Block",
+  "item.xpcrafting.example_item": "Example Item",
+
+  "xpcrafting.configuration.title": "XPCrafting Configs",
+  "xpcrafting.configuration.section.xpcrafting.common.toml": "XPCrafting Configs",
+  "xpcrafting.configuration.section.xpcrafting.common.toml.title": "XPCrafting Configs",
+  "xpcrafting.configuration.items": "Item List",
+  "xpcrafting.configuration.logDirtBlock": "Log Dirt Block",
+  "xpcrafting.configuration.magicNumberIntroduction": "Magic Number Text",
+  "xpcrafting.configuration.magicNumber": "Magic Number"
+}
