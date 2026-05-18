@@ -8,6 +8,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -74,28 +75,28 @@ public class CraftingScreen extends AbstractContainerScreen<CraftingMenu> {
 
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+        // Semi-transparent panel matching vanilla inventory darkness
         graphics.fill(
                 this.leftPos, this.topPos,
                 this.leftPos + GUI_WIDTH, this.topPos + GUI_HEIGHT,
-                0xCC000000
+                0x88000000
         );
         // Border
-        graphics.fill(this.leftPos,                 this.topPos,                     this.leftPos + GUI_WIDTH, this.topPos + 1,              0xFF444444);
-        graphics.fill(this.leftPos,                 this.topPos + GUI_HEIGHT - 1,    this.leftPos + GUI_WIDTH, this.topPos + GUI_HEIGHT,      0xFF444444);
-        graphics.fill(this.leftPos,                 this.topPos,                     this.leftPos + 1,         this.topPos + GUI_HEIGHT,      0xFF444444);
-        graphics.fill(this.leftPos + GUI_WIDTH - 1, this.topPos,                     this.leftPos + GUI_WIDTH, this.topPos + GUI_HEIGHT,      0xFF444444);
+        graphics.fill(this.leftPos,                 this.topPos,                  this.leftPos + GUI_WIDTH, this.topPos + 1,          0xFF444444);
+        graphics.fill(this.leftPos,                 this.topPos + GUI_HEIGHT - 1, this.leftPos + GUI_WIDTH, this.topPos + GUI_HEIGHT, 0xFF444444);
+        graphics.fill(this.leftPos,                 this.topPos,                  this.leftPos + 1,         this.topPos + GUI_HEIGHT, 0xFF444444);
+        graphics.fill(this.leftPos + GUI_WIDTH - 1, this.topPos,                  this.leftPos + GUI_WIDTH, this.topPos + GUI_HEIGHT, 0xFF444444);
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+        // No renderBackground() call — world stays fully visible behind the panel
         super.render(graphics, mouseX, mouseY, partialTick);
         recipeList.render(graphics, mouseX, mouseY, partialTick);
 
         // Title
         graphics.drawString(this.font, "XP Crafting", this.leftPos + 8, this.topPos - 10, 0xFFFFFF);
 
-        // Detail panel
         int detailX = this.leftPos + LIST_WIDTH + 15;
         int detailY = this.topPos + 15;
 
@@ -104,9 +105,21 @@ public class CraftingScreen extends AbstractContainerScreen<CraftingMenu> {
         } else {
             // Recipe name
             graphics.drawString(this.font, selectedRecipe.getDisplayName(), detailX, detailY, 0xFFFFFF);
-            detailY += 14;
+            detailY += 18;
 
-            // Ingredients
+            // Result item — 32x32 scaled icon
+            Item resultItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(selectedRecipe.getResultItem()));
+            if (resultItem != null) {
+                ItemStack resultStack = new ItemStack(resultItem, selectedRecipe.getResultCount());
+                graphics.pose().pushPose();
+                graphics.pose().translate(detailX, detailY, 0);
+                graphics.pose().scale(2.0f, 2.0f, 1.0f);
+                graphics.renderItem(resultStack, 0, 0);
+                graphics.pose().popPose();
+                detailY += 40; // 32px icon + 8px gap
+            }
+
+            // Ingredients header
             graphics.drawString(this.font, "Ingredients:", detailX, detailY, 0xAAAAAA);
             detailY += 12;
 
@@ -116,9 +129,16 @@ public class CraftingScreen extends AbstractContainerScreen<CraftingMenu> {
                 int held      = countItem(itemId);
                 boolean met   = held >= required;
 
-                String line = "- " + itemId.replace("minecraft:", "") + " x" + required + " (" + held + " held)";
-                graphics.drawString(this.font, line, detailX, detailY, met ? 0x55FF55 : 0xFF5555);
-                detailY += 11;
+                // 16x16 ingredient icon
+                Item ingItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemId));
+                if (ingItem != null) {
+                    graphics.renderItem(new ItemStack(ingItem), detailX, detailY - 4);
+                }
+
+                // Ingredient text offset to the right of the icon
+                String line = itemId.replace("minecraft:", "") + " x" + required + " (" + held + " held)";
+                graphics.drawString(this.font, line, detailX + 20, detailY, met ? 0x55FF55 : 0xFF5555);
+                detailY += 18;
             }
 
             // XP cost
@@ -128,7 +148,6 @@ public class CraftingScreen extends AbstractContainerScreen<CraftingMenu> {
             String xpLine    = "XP: " + selectedRecipe.getXpCost() + " levels (" + playerLevels + " held)";
             graphics.drawString(this.font, xpLine, detailX, detailY, xpMet ? 0x55FF55 : 0xFF5555);
 
-            // Enable/disable craft button based on whether all requirements are met
             craftButton.active = xpMet && canCraft(selectedRecipe);
         }
     }
