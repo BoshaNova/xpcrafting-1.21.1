@@ -11,7 +11,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-
+import com.bosaa.xpcrafting.network.CraftRequestPacket;
+import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.List;
 import java.util.Map;
 
@@ -173,6 +174,8 @@ public class CraftingScreen extends AbstractContainerScreen<CraftingMenu> {
     }
 
     private void onCraftClicked() {
-        // Stage 3 next: send CraftRequestPacket to server
+        if (selectedRecipe != null) {
+            PacketDistributor.sendToServer(new CraftRequestPacket(selectedRecipe.getId()));
+        }
     }
 }
