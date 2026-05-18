@@ -40,39 +40,33 @@ public class CraftingMenu extends AbstractContainerMenu {
         return player;
     }
 
-    public void tryCraft(String recipeId) {
-        // Find the recipe
+    public boolean tryCraft(String recipeId) {
         CraftingRecipe recipe = RecipeRegistry.INSTANCE.getRecipes().stream()
                 .filter(r -> r.getId().equals(recipeId))
                 .findFirst()
                 .orElse(null);
 
-        if (recipe == null) return;
+        if (recipe == null) return false;
+        if (player.experienceLevel < recipe.getXpCost()) return false;
 
-        // Check XP
-        if (player.experienceLevel < recipe.getXpCost()) return;
-
-        // Check ingredients
         for (Map.Entry<String, Integer> entry : recipe.getIngredients().entrySet()) {
             Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(entry.getKey()));
-            if (item == null) return;
-            if (countItem(item) < entry.getValue()) return;
+            if (item == null) return false;
+            if (countItem(item) < entry.getValue()) return false;
         }
 
-        // Consume ingredients
         for (Map.Entry<String, Integer> entry : recipe.getIngredients().entrySet()) {
             Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(entry.getKey()));
             consumeItem(item, entry.getValue());
         }
 
-        // Consume XP
         player.giveExperienceLevels(-recipe.getXpCost());
 
-        // Give result
         Item resultItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(recipe.getResultItem()));
-        if (resultItem == null) return;
-        ItemStack result = new ItemStack(resultItem, recipe.getResultCount());
-        player.getInventory().add(result);
+        if (resultItem == null) return false;
+        player.getInventory().add(new ItemStack(resultItem, recipe.getResultCount()));
+
+        return true;
     }
 
     private int countItem(Item item) {

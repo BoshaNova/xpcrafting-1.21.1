@@ -17,5 +17,10 @@ public class ModNetwork {
                 CraftRequestPacket.STREAM_CODEC,
                 CraftRequestPacket::handle
         );
+        registrar.playToClient(
+                CraftSuccessPacket.TYPE,
+                CraftSuccessPacket.STREAM_CODEC,
+                CraftSuccessPacket::handle
+        );
     }
 }
