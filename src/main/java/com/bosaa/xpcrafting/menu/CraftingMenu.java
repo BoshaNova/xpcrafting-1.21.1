@@ -64,7 +64,17 @@ public class CraftingMenu extends AbstractContainerMenu {
 
         Item resultItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(recipe.getResultItem()));
         if (resultItem == null) return false;
-        player.getInventory().add(new ItemStack(resultItem, recipe.getResultCount()));
+
+        ItemStack result = new ItemStack(resultItem, recipe.getResultCount());
+        int countBefore = result.getCount();
+        player.getInventory().add(result);
+
+// Drop however many items didn't fit
+        // BUG doesn't work in creative, but works in survival
+        int notAdded = result.getCount();
+        if (notAdded > 0) {
+            player.drop(new ItemStack(resultItem, notAdded), false);
+        }
 
         return true;
     }
