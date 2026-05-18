@@ -1,6 +1,7 @@
 package com.bosaa.xpcrafting;
 
 import com.bosaa.xpcrafting.block.XPCraftingTableBlock;
+import com.bosaa.xpcrafting.crafting.RecipeRegistry;
 import com.bosaa.xpcrafting.menu.ModMenuTypes;
 import com.mojang.logging.LogUtils;
 
@@ -33,5 +34,6 @@ public class XPCrafting {
     public XPCrafting(IEventBus modEventBus, ModContainer modContainer) {
         BLOCKS.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        RecipeRegistry.init();
     }
 }

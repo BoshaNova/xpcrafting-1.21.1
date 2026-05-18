@@ -1,0 +1,24 @@
+[
+  {
+    "id": "iron_sword",
+    "displayName": "Iron Sword",
+    "ingredients": {
+      "minecraft:iron_ingot": 2,
+      "minecraft:stick": 1
+    },
+    "resultItem": "minecraft:iron_sword",
+    "resultCount": 1,
+    "xpCost": 3
+  },
+  {
+    "id": "golden_apple",
+    "displayName": "Golden Apple",
+    "ingredients": {
+      "minecraft:gold_ingot": 8,
+      "minecraft:apple": 1
+    },
+    "resultItem": "minecraft:golden_apple",
+    "resultCount": 1,
+    "xpCost": 5
+  }
+]

@@ -22,23 +22,34 @@ public class RecipeSelectionList extends ObjectSelectionList<RecipeSelectionList
         return this.getX() + this.width - 6;
     }
 
-    // Expose addEntry publicly so CraftingScreen can call it
     @Override
     public int addEntry(RecipeEntry entry) {
         return super.addEntry(entry);
     }
+
     public static class RecipeEntry extends ObjectSelectionList.Entry<RecipeEntry> {
 
         private final String displayName;
+        private final Runnable onSelect;
 
-        public RecipeEntry(String displayName) {
+        public RecipeEntry(String displayName, Runnable onSelect) {
             this.displayName = displayName;
+            this.onSelect    = onSelect;
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            onSelect.run();
+            return true;
         }
 
         @Override
         public void render(GuiGraphics graphics, int index, int top, int left,
                            int width, int height, int mouseX, int mouseY,
                            boolean isMouseOver, float partialTick) {
+            if (isMouseOver) {
+                graphics.fill(left, top, left + width, top + height, 0x44FFFFFF);
+            }
             graphics.drawString(
                     Minecraft.getInstance().font,
                     displayName,
